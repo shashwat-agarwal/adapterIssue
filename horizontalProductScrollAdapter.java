@@ -1,5 +1,6 @@
 package agarwal.shashwat.ecommerce;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,16 +17,18 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.squareup.picasso.Picasso;
 
-public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<horizontalProductModel, horizontolProductScrollAdapter.ViewHolder> {
+public class horizontalProductScrollAdapter extends FirestoreRecyclerAdapter<horizontalProductModel, horizontalProductScrollAdapter.ViewHolder> {
     private static final String TAG = "horizontalProductAdpter";
     private OnItemClickListener listener;
-     
 
-    public horizontolProductScrollAdapter(@NonNull FirestoreRecyclerOptions<horizontalProductModel> options) {
+    private Context context;
+
+    public horizontalProductScrollAdapter(@NonNull FirestoreRecyclerOptions<horizontalProductModel> options, Context context) {
         super(options);
+        this.context = context;
     }
+
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull horizontalProductModel model) {
@@ -34,7 +37,7 @@ public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<ho
            holder.productPrice.setText(model.getProductPrice()+"");
            try {
 
-               Glide.with()
+               Glide.with(context)
                        .load(model.getProductImage())
                      //  .centerCrop()
                        .into(holder.productImage);

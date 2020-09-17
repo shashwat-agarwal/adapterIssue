@@ -1,4 +1,4 @@
-package agarwal.shashwat.ecommerce.ui.home;
+package agarwal.shashwat.ecommerce;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -24,45 +24,53 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Objects;
 
-import agarwal.shashwat.ecommerce.R;
 import agarwal.shashwat.ecommerce.data.Product;
 import agarwal.shashwat.ecommerce.data.ProductViewModel;
 import agarwal.shashwat.ecommerce.data.ProductViewModelFactory;
-import agarwal.shashwat.ecommerce.horizontalProductModel;
-import agarwal.shashwat.ecommerce.horizontolProductScrollAdapter;
 
 import static android.content.ContentValues.TAG;
 
 public class HomeFragment extends Fragment {
 
-    public RecyclerView recyclerView;
-    private horizontolProductScrollAdapter adapter;
+    private horizontalProductScrollAdapter adapterVegetable,adapterDailyNeeds,adapterMilk;
 
     private CollectionReference vegetables= FirebaseFirestore.getInstance().collection("vegetables");
+    private CollectionReference dailyNeeds= FirebaseFirestore.getInstance().collection("dailyNeeds");
+    private CollectionReference milk= FirebaseFirestore.getInstance().collection("milk");
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
        View view=inflater.inflate(R.layout.fragment_home,container,false);
 
-       // recycler view vegetable starts
+      recyclerViewVegetable(view);
+      recyclerViewDailyNeeds(view);
+      recyclerViewMilk(view);
+
+
+
+       return view;
+    }
+
+    private void recyclerViewVegetable(View view) {
+
+
+
         Query query = vegetables.orderBy("productName");
 
         FirestoreRecyclerOptions<horizontalProductModel> options=new FirestoreRecyclerOptions.Builder<horizontalProductModel>()
                 .setQuery(query,horizontalProductModel.class)
                 .build();
-        adapter=new horizontolProductScrollAdapter(options);
-        adapter.updateOptions(options);
+        adapterVegetable=new horizontalProductScrollAdapter(options,getContext());
+        adapterVegetable.updateOptions(options);
 
-       recyclerView=view.findViewById(R.id.horizontal_scroll_layout_recyclerview);
-      // recyclerView.setHasFixedSize(true);
-       recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-       //recyclerView.setAdapter(new randomAdapter(1234));
+        RecyclerView recyclerView=view.findViewById(R.id.horizontal_scroll_layout_recyclerview_vegetable);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 
-       recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapterVegetable);
 
 
-       vegetables
+        vegetables
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -77,42 +85,136 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
-       adapter.notifyDataSetChanged();
+        adapterVegetable.notifyDataSetChanged();
 
         final ProductViewModel productViewModel =new ViewModelProvider(this, new ProductViewModelFactory(getActivity().getApplication())).get(ProductViewModel.class);
-       adapter.setOnItemClickListener(new horizontolProductScrollAdapter.OnItemClickListener() {
-           @Override
-           public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+        adapterVegetable.setOnItemClickListener(new horizontalProductScrollAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
 
-               Product product=documentSnapshot.toObject(Product.class);
-               assert product != null;
-               Log.d("name_cart", ""+product.getProductName());
-               productViewModel.insert(product);
+                Product product=documentSnapshot.toObject(Product.class);
+                assert product != null;
+                Log.d("name_cart", ""+product.getProductName());
+                productViewModel.insert(product);
 
-           }
-       });
-       //recyclerview vegetable ends
-
-       return view;
+            }
+        });
     }
 
+    private void recyclerViewDailyNeeds(View view) {
+
+        Query query = dailyNeeds.orderBy("productName");
+
+        FirestoreRecyclerOptions<horizontalProductModel> options=new FirestoreRecyclerOptions.Builder<horizontalProductModel>()
+                .setQuery(query,horizontalProductModel.class)
+                .build();
+        adapterDailyNeeds=new horizontalProductScrollAdapter(options,getContext());
+        adapterDailyNeeds.updateOptions(options);
+
+        RecyclerView recyclerView=view.findViewById(R.id.horizontal_scroll_layout_recyclerview_dailyneeds);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+
+        recyclerView.setAdapter(adapterDailyNeeds);
+
+
+        dailyNeeds
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+
+        adapterDailyNeeds.notifyDataSetChanged();
+
+        final ProductViewModel productViewModel =new ViewModelProvider(this, new ProductViewModelFactory(getActivity().getApplication())).get(ProductViewModel.class);
+        adapterDailyNeeds.setOnItemClickListener(new horizontalProductScrollAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+
+                Product product=documentSnapshot.toObject(Product.class);
+                assert product != null;
+                Log.d("name_cart", ""+product.getProductName());
+                productViewModel.insert(product);
+
+            }
+        });
+    }
+
+    private void recyclerViewMilk(View view) {
+
+        Query query = milk.orderBy("productName");
+
+        FirestoreRecyclerOptions<horizontalProductModel> options=new FirestoreRecyclerOptions.Builder<horizontalProductModel>()
+                .setQuery(query,horizontalProductModel.class)
+                .build();
+        adapterMilk=new horizontalProductScrollAdapter(options,getContext());
+        adapterMilk.updateOptions(options);
+
+        RecyclerView recyclerView=view.findViewById(R.id.horizontal_scroll_layout_recyclerview_milk);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+
+        recyclerView.setAdapter(adapterMilk);
+
+
+        milk
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+
+        adapterMilk.notifyDataSetChanged();
+
+        final ProductViewModel productViewModel =new ViewModelProvider(this, new ProductViewModelFactory(getActivity().getApplication())).get(ProductViewModel.class);
+        adapterDailyNeeds.setOnItemClickListener(new horizontalProductScrollAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
+
+                Product product=documentSnapshot.toObject(Product.class);
+                assert product != null;
+                Log.d("name_cart", ""+product.getProductName());
+                productViewModel.insert(product);
+
+            }
+        });
+    }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        if (adapter!=null) {
+        if (adapterVegetable!=null) {
             Log.d(TAG, "onStart: Fragment started");
 
-            adapter.startListening();
-            adapter.notifyDataSetChanged();
+            adapterVegetable.startListening();
+            adapterDailyNeeds.startListening();
+            adapterMilk.startListening();
+            adapterVegetable.notifyDataSetChanged();
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        adapter.stopListening();
+        adapterVegetable.stopListening();
+        adapterDailyNeeds.stopListening();
+        adapterMilk.stopListening();
     }
 
 
@@ -120,7 +222,9 @@ public class HomeFragment extends Fragment {
     public void onResume(){
         super.onResume();
         Log.d(TAG, "onResume: WORKING");
-        adapter.notifyDataSetChanged();
+        adapterVegetable.notifyDataSetChanged();
+        adapterDailyNeeds.notifyDataSetChanged();
+        adapterMilk.notifyDataSetChanged();
     }
 }
 
