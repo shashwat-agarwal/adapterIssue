@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,11 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.squareup.picasso.Picasso;
 
 public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<horizontalProductModel, horizontolProductScrollAdapter.ViewHolder> {
     private static final String TAG = "horizontalProductAdpter";
+    private OnItemClickListener listener;
 
 
     public horizontolProductScrollAdapter(@NonNull FirestoreRecyclerOptions<horizontalProductModel> options) {
@@ -29,7 +32,11 @@ public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<ho
            holder.productQuantity.setText(model.getProductQuantity());
            holder.productPrice.setText(model.getProductPrice()+"");
            try {
-               Picasso.get().load(model.getProductImage()).centerCrop().fit().into(holder.productImage);
+
+               Picasso.get()
+                       .load(model.getProductImage())
+                     //  .centerCrop()
+                       .into(holder.productImage);
            }catch (Exception e){
                Log.e(TAG, "onBindViewHolder: "+e.getMessage() );
            }
@@ -53,6 +60,7 @@ public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<ho
 
         TextView productName,productPrice,productQuantity;
         ImageView productImage;
+        Button addProduct;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -60,6 +68,27 @@ public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<ho
             productName=itemView.findViewById(R.id.productName);
             productPrice=itemView.findViewById(R.id.productPrice);
             productQuantity=itemView.findViewById(R.id.productQuantity);
+            addProduct=itemView.findViewById(R.id.addProduct);
+
+            addProduct.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position=getAdapterPosition();
+                    if (position!=RecyclerView.NO_POSITION && listener!=null){
+                        listener.onItemClick(getSnapshots().getSnapshot(position),position);
+                    }
+                }
+            });
         }
+
+
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(DocumentSnapshot documentSnapshot, int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener listener){
+
+        this.listener=listener;
     }
 }
