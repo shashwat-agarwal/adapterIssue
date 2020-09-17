@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,7 +21,7 @@ import com.squareup.picasso.Picasso;
 public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<horizontalProductModel, horizontolProductScrollAdapter.ViewHolder> {
     private static final String TAG = "horizontalProductAdpter";
     private OnItemClickListener listener;
-
+     
 
     public horizontolProductScrollAdapter(@NonNull FirestoreRecyclerOptions<horizontalProductModel> options) {
         super(options);
@@ -33,7 +34,7 @@ public class horizontolProductScrollAdapter  extends FirestoreRecyclerAdapter<ho
            holder.productPrice.setText(model.getProductPrice()+"");
            try {
 
-               Picasso.get()
+               Glide.with()
                        .load(model.getProductImage())
                      //  .centerCrop()
                        .into(holder.productImage);
