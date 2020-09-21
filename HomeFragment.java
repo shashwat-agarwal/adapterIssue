@@ -1,5 +1,6 @@
 package agarwal.shashwat.ecommerce;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +34,7 @@ import static android.content.ContentValues.TAG;
 public class HomeFragment extends Fragment {
 
     private horizontalProductScrollAdapter adapterVegetable,adapterDailyNeeds,adapterMilk;
+    private CartAdapter adapter;
 
     private CollectionReference vegetables= FirebaseFirestore.getInstance().collection("vegetables");
     private CollectionReference dailyNeeds= FirebaseFirestore.getInstance().collection("dailyNeeds");
@@ -43,9 +45,62 @@ public class HomeFragment extends Fragment {
 
        View view=inflater.inflate(R.layout.fragment_home,container,false);
 
+       adapter=new CartAdapter(getContext());
+
+        view.findViewById(R.id.viewAllButton_vegetable).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), verticalScrollActivity.class);
+                intent.putExtra("collection","vegetables");
+                startActivity(intent);
+            }
+        });
+        view.findViewById(R.id.viewAllButton_dailyneeds).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), verticalScrollActivity.class);
+                intent.putExtra("collection","dailyNeeds");
+                startActivity(intent);
+            }
+        });
+        view.findViewById(R.id.viewAllButton_milk).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), verticalScrollActivity.class);
+                intent.putExtra("collection","milk");
+                startActivity(intent);
+            }
+        });
+
+        view.findViewById(R.id.linearLayoutVegetableCategory).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), verticalScrollActivity.class);
+                intent.putExtra("collection","vegetables");
+                startActivity(intent);
+            }
+        });
+        view.findViewById(R.id.linearLayoutDailyNeedsCategory).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), verticalScrollActivity.class);
+                intent.putExtra("collection","dailyNeeds");
+                startActivity(intent);
+            }
+        });
+        view.findViewById(R.id.linearLayoutMilkCategory).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), verticalScrollActivity.class);
+                intent.putExtra("collection","milk");
+                startActivity(intent);
+            }
+        });
+
       recyclerViewVegetable(view);
       recyclerViewDailyNeeds(view);
       recyclerViewMilk(view);
+
 
 
 
@@ -94,10 +149,26 @@ public class HomeFragment extends Fragment {
 
                 Product product=documentSnapshot.toObject(Product.class);
                 assert product != null;
-                Log.d("name_cart", ""+product.getProductName());
+                Log.d("inserted_in_cart", ""+product.getProductName());
                 productViewModel.insert(product);
 
             }
+
+            @Override
+            public void onUpdateClick(int position, int count) {
+
+            }
+
+            @Override
+            public void onDeleteClick(DocumentSnapshot documentSnapshot, int position) {
+                Product product=documentSnapshot.toObject(Product.class);
+                productViewModel.delete(product);
+
+                Log.d(TAG, "onDeleteClick: deleted");
+                adapter.notifyDataSetChanged();
+            }
+
+
         });
     }
 
@@ -141,9 +212,22 @@ public class HomeFragment extends Fragment {
 
                 Product product=documentSnapshot.toObject(Product.class);
                 assert product != null;
-                Log.d("name_cart", ""+product.getProductName());
+                Log.d("inserted_in_cart", ""+product.getProductName());
                 productViewModel.insert(product);
 
+            }
+
+            @Override
+            public void onUpdateClick(int position, int count) {
+
+            }
+
+            @Override
+            public void onDeleteClick(DocumentSnapshot documentSnapshot, int position) {
+                Product product=documentSnapshot.toObject(Product.class);
+                productViewModel.delete(product);
+
+                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -182,15 +266,29 @@ public class HomeFragment extends Fragment {
         adapterMilk.notifyDataSetChanged();
 
         final ProductViewModel productViewModel =new ViewModelProvider(this, new ProductViewModelFactory(getActivity().getApplication())).get(ProductViewModel.class);
-        adapterDailyNeeds.setOnItemClickListener(new horizontalProductScrollAdapter.OnItemClickListener() {
+        adapterMilk.setOnItemClickListener(new horizontalProductScrollAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
 
                 Product product=documentSnapshot.toObject(Product.class);
                 assert product != null;
-                Log.d("name_cart", ""+product.getProductName());
+                Log.d("inserted_in_cart", ""+product.getProductName());
                 productViewModel.insert(product);
 
+            }
+
+            @Override
+            public void onUpdateClick(int position, int count) {
+
+            }
+
+            @Override
+            public void onDeleteClick(DocumentSnapshot documentSnapshot, int position) {
+                Product product=documentSnapshot.toObject(Product.class);
+                productViewModel.delete(product);
+
+                Log.d(TAG, "onDeleteClick: deleted");
+                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -226,5 +324,6 @@ public class HomeFragment extends Fragment {
         adapterDailyNeeds.notifyDataSetChanged();
         adapterMilk.notifyDataSetChanged();
     }
+
 }
 
